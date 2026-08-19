@@ -7,13 +7,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model WaitlistEntry {
+model Project {
   id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  source    String?
+  slug      String   @unique
+  name      String
   createdAt DateTime @default(now())
 
-  @@index([createdAt])
+  entries WaitlistEntry[]
+
+  @@map("projects")
+}
+
+model WaitlistEntry {
+  id             String    @id @default(cuid())
+  projectId      String
+  project        Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  email          String
+  name           String?
+  source         String?
+  emailId        String?
+  emailStatus    String?
+  emailUpdatedAt DateTime?
+  createdAt      DateTime  @default(now())
+
+  @@unique([projectId, email])
+  @@index([projectId, createdAt])
   @@map("waitlist_entries")
 }

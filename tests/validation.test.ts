@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { signupSchema } from "@/lib/validation";
+import { signupSchema, createProjectSchema, slugSchema } from "@/lib/validation";
 
 describe("signupSchema", () => {
   it("accepts a valid email", () => {
@@ -41,5 +41,43 @@ describe("signupSchema", () => {
     const r = signupSchema.safeParse({ email: "jane@example.com", company: "bot corp" });
     expect(r.success).toBe(true);
     if (r.success) expect(r.data.company).toBe("bot corp");
+  });
+
+  it("accepts an optional slug", () => {
+    const r = signupSchema.safeParse({ email: "jane@example.com", slug: "garden-pavilion" });
+    expect(r.success).toBe(true);
+    if (r.success) expect(r.data.slug).toBe("garden-pavilion");
+  });
+});
+
+describe("slugSchema", () => {
+  it("accepts a url-safe slug", () => {
+    expect(slugSchema.safeParse("garden-pavilion").success).toBe(true);
+  });
+
+  it("lowercases the slug", () => {
+    const r = slugSchema.safeParse("Garden-Pavilion");
+    expect(r.success).toBe(true);
+    if (r.success) expect(r.data).toBe("garden-pavilion");
+  });
+
+  it("rejects spaces and punctuation", () => {
+    expect(slugSchema.safeParse("garden pavilion!").success).toBe(false);
+  });
+
+  it("rejects leading/trailing hyphens", () => {
+    expect(slugSchema.safeParse("-garden-").success).toBe(false);
+  });
+});
+
+describe("createProjectSchema", () => {
+  it("accepts a name and slug", () => {
+    const r = createProjectSchema.safeParse({ name: "Garden Pavilion", slug: "garden-pavilion" });
+    expect(r.success).toBe(true);
+  });
+
+  it("requires a non-empty name", () => {
+    const r = createProjectSchema.safeParse({ name: "  ", slug: "garden-pavilion" });
+    expect(r.success).toBe(false);
   });
 });

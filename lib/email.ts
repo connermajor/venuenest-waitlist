@@ -9,11 +9,12 @@ const SERIF = "Georgia, 'Times New Roman', serif";
 type ConfirmationArgs = { to: string; name?: string | null; position: number };
 
 // Sends the "you're on the list" email. Never throws into the request path:
-// a signup should still succeed if email delivery hiccups.
-export async function sendConfirmationEmail({ to, name, position }: ConfirmationArgs): Promise<void> {
+// a signup should still succeed if email delivery hiccups. Returns the Resend
+// message id (used to reconcile later delivery/bounce webhooks), or null.
+export async function sendConfirmationEmail({ to, name, position }: ConfirmationArgs): Promise<string | null> {
   if (!apiKey) {
     console.warn("[email] RESEND_API_KEY not set; skipping confirmation email.");
-    return;
+    return null;
   }
 
   const resend = new Resend(apiKey);
@@ -51,13 +52,19 @@ export async function sendConfirmationEmail({ to, name, position }: Confirmation
   </table>`;
 
   try {
-    await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from,
       to,
       subject: "You're on the VenueNest waitlist",
       html,
     });
+    if (error) {
+      console.error("[email] failed to send confirmation:", error);
+      return null;
+    }
+    return data?.id ?? null;
   } catch (err) {
     console.error("[email] failed to send confirmation:", err);
+    return null;
   }
 }

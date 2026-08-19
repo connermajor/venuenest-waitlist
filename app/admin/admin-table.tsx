@@ -8,7 +8,29 @@ export type AdminRow = {
   email: string;
   name: string | null;
   joined: string;
+  emailStatus: string | null;
 };
+
+// Maps a Resend delivery status to a small colored badge. Null = we never
+// recorded a send (e.g. RESEND_API_KEY absent in that environment).
+function StatusBadge({ status }: { status: string | null }) {
+  const s = status ?? "unknown";
+  const tone: Record<string, string> = {
+    delivered: "border-green-200 bg-green-50 text-green-700",
+    sent: "border-sage-line bg-sage-tint text-sage-deep",
+    opened: "border-green-200 bg-green-50 text-green-700",
+    bounced: "border-red-200 bg-red-50 text-red-700",
+    complained: "border-red-200 bg-red-50 text-red-700",
+    delivery_delayed: "border-amber-200 bg-amber-50 text-amber-700",
+    unknown: "border-neutral-200 bg-neutral-50 text-neutral-500",
+  };
+  const cls = tone[s] ?? tone.unknown;
+  return (
+    <span className={`inline-block rounded-full border px-2 py-0.5 text-xs font-medium ${cls}`}>
+      {s.replace(/_/g, " ")}
+    </span>
+  );
+}
 
 export default function AdminTable({ entries }: { entries: AdminRow[] }) {
   const [q, setQ] = useState("");
@@ -44,19 +66,20 @@ export default function AdminTable({ entries }: { entries: AdminRow[] }) {
               <th className="px-4 py-2.5 font-medium">#</th>
               <th className="px-4 py-2.5 font-medium">Email</th>
               <th className="px-4 py-2.5 font-medium">Name</th>
+              <th className="px-4 py-2.5 font-medium">Email status</th>
               <th className="px-4 py-2.5 font-medium">Joined</th>
             </tr>
           </thead>
           <tbody>
             {entries.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-4 py-10 text-center text-neutral-500">
+                <td colSpan={5} className="px-4 py-10 text-center text-neutral-500">
                   No signups yet.
                 </td>
               </tr>
             ) : filtered.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-4 py-10 text-center text-neutral-500">
+                <td colSpan={5} className="px-4 py-10 text-center text-neutral-500">
                   No matches for &ldquo;{q.trim()}&rdquo;.
                 </td>
               </tr>
@@ -66,6 +89,7 @@ export default function AdminTable({ entries }: { entries: AdminRow[] }) {
                   <td className="px-4 py-2.5 font-mono text-neutral-500">{e.position}</td>
                   <td className="px-4 py-2.5 text-neutral-900">{e.email}</td>
                   <td className="px-4 py-2.5 text-neutral-500">{e.name ?? "—"}</td>
+                  <td className="px-4 py-2.5"><StatusBadge status={e.emailStatus} /></td>
                   <td className="px-4 py-2.5 font-mono text-neutral-500">{e.joined}</td>
                 </tr>
               ))

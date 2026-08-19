@@ -4,7 +4,9 @@ import { useState } from "react";
 
 type Status = "idle" | "loading" | "ok" | "already" | "error";
 
-export default function WaitlistForm() {
+// `slug` scopes the signup to a specific waitlist (tenant). Omitted on the
+// homepage, where the API defaults to the primary VenueNest list.
+export default function WaitlistForm({ slug }: { slug?: string }) {
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
   const [position, setPosition] = useState<number | null>(null);
@@ -19,6 +21,7 @@ export default function WaitlistForm() {
       email: (form.elements.namedItem("email") as HTMLInputElement).value,
       name: (form.elements.namedItem("name") as HTMLInputElement).value,
       company: (form.elements.namedItem("company") as HTMLInputElement).value, // honeypot
+      ...(slug ? { slug } : {}),
     };
 
     try {

@@ -1,4 +1,6 @@
+import Image from "next/image";
 import { prisma } from "@/lib/prisma";
+import logo from "@/public/venuenest-logo.png";
 import WaitlistForm from "./waitlist-form";
 
 export const dynamic = "force-dynamic";
@@ -15,8 +17,8 @@ export default async function Home() {
     <main className="min-h-screen bg-neutral-50 flex items-center justify-center px-6 py-16">
       <div className="w-full max-w-md">
         <div className="mb-8">
-          <div className="flex items-center gap-2">
-            <div className="h-6 w-6 rounded-md bg-neutral-900" />
+          <div className="flex items-center gap-2.5">
+            <Image src={logo} alt="VenueNest" width={40} height={30} priority />
             <span className="text-sm font-mono font-medium tracking-tight text-neutral-900">
               VenueNest
             </span>

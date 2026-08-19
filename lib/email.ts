@@ -2,6 +2,10 @@ import { Resend } from "resend";
 
 const apiKey = process.env.RESEND_API_KEY;
 
+// Hosted brand mark (served from /public on the deployed site).
+const LOGO_URL = "https://venuenest-waitlist-three.vercel.app/venuenest-logo.png";
+const SERIF = "Georgia, 'Times New Roman', serif";
+
 type ConfirmationArgs = { to: string; name?: string | null; position: number };
 
 // Sends the "you're on the list" email. Never throws into the request path:
@@ -16,20 +20,42 @@ export async function sendConfirmationEmail({ to, name, position }: Confirmation
   const from = process.env.EMAIL_FROM ?? "VenueNest Waitlist <onboarding@resend.dev>";
   const greeting = name ? `Hi ${name},` : "Hi there,";
 
+  const html = `
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0">You're on the VenueNest waitlist — you're #${position} in line.</div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f7f6f1;padding:40px 0;font-family:${SERIF};">
+    <tr><td align="center">
+      <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="width:480px;max-width:92%;">
+        <tr><td align="center" style="padding-bottom:6px;">
+          <img src="${LOGO_URL}" width="92" alt="VenueNest" style="display:block;border:0;width:92px;height:auto;" />
+        </td></tr>
+        <tr><td align="center" style="padding-bottom:26px;">
+          <span style="font-family:${SERIF};font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#8a8a82;">VenueNest</span>
+        </td></tr>
+        <tr><td style="background-color:#ffffff;border:1px solid #ecece3;border-radius:14px;padding:40px 40px 36px;">
+          <h1 style="margin:0 0 18px;font-family:${SERIF};font-size:26px;font-weight:normal;color:#2e2e2a;text-align:center;">You're on the list</h1>
+          <p style="margin:0 0 16px;font-family:${SERIF};font-size:16px;line-height:1.6;color:#4a4a44;">${greeting}</p>
+          <p style="margin:0 0 8px;font-family:${SERIF};font-size:16px;line-height:1.6;color:#4a4a44;">Thank you for joining the VenueNest waitlist. We're building a calmer way to discover and book beautiful venues, and we'd love to have you along.</p>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:24px 0;">
+            <table role="presentation" cellpadding="0" cellspacing="0"><tr><td align="center" style="background-color:#f2f5ec;border:1px solid #d7e0c9;border-radius:12px;padding:18px 36px;">
+              <div style="font-family:${SERIF};font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#6e7f58;">Your place in line</div>
+              <div style="font-family:${SERIF};font-size:34px;color:#5f7049;padding-top:4px;">#${position}</div>
+            </td></tr></table>
+          </td></tr></table>
+          <p style="margin:0;font-family:${SERIF};font-size:16px;line-height:1.6;color:#4a4a44;text-align:center;">We'll email you the moment your spot opens. Nothing else is needed for now.</p>
+        </td></tr>
+        <tr><td align="center" style="padding:26px 20px 0;">
+          <p style="margin:0;font-family:${SERIF};font-size:13px;line-height:1.6;color:#a3a39a;font-style:italic;">Beautiful venues, booked without the back-and-forth.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>`;
+
   try {
     await resend.emails.send({
       from,
       to,
       subject: "You're on the VenueNest waitlist",
-      html: `
-        <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#0f172a">
-          <h1 style="font-size:20px;margin:0 0 12px">You're on the list</h1>
-          <p style="margin:0 0 12px;line-height:1.5">${greeting}</p>
-          <p style="margin:0 0 12px;line-height:1.5">Thanks for joining the VenueNest waitlist. You're <strong>#${position}</strong> in line, and we'll email you the moment your spot opens up.</p>
-          <p style="margin:0 0 12px;line-height:1.5">No action needed for now.</p>
-          <p style="margin:24px 0 0;font-size:13px;color:#64748b">VenueNest</p>
-        </div>
-      `,
+      html,
     });
   } catch (err) {
     console.error("[email] failed to send confirmation:", err);

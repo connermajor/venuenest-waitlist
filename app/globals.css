@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+/* Map the Geist font variables (loaded in layout.tsx via next/font) onto
+   Tailwind's font-sans / font-mono utilities. Geist Mono is for any number
+   the eye compares in a column. */
+@theme {
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+/* Two backgrounds, not five: white primary surface, neutral-50 secondary. */
+body {
+  background-color: #ffffff;
+  color: var(--color-neutral-900);
+  font-family: var(--font-sans);
+}

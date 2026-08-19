@@ -1,8 +1,16 @@
 # VenueNest Waitlist
 
 A small, production-shaped waitlist tool: a signup form, Postgres storage, an
-admin view, and a confirmation email on signup. Built to deploy on Vercel free
-tier with a free Supabase (or Vercel) Postgres.
+admin view, and a confirmation email on signup.
+
+## Live demo
+
+- **Signup form:** https://venuenest-waitlist-three.vercel.app
+- **Admin view:** https://venuenest-waitlist-three.vercel.app/admin — password `venue-05955c9d`
+
+Running live on Vercel with Neon Postgres. The admin view is a demo instance, so
+the password is shared here on purpose; sign up on the form and you'll see the
+row appear in the admin table with its waitlist position.
 
 ## Stack
 
@@ -26,30 +34,6 @@ tier with a free Supabase (or Vercel) Postgres.
 - **Honeypot** field + a best-effort **rate limit** to blunt bot spam.
 - **CSV export** from the admin view.
 - Admin auth stores a **hashed** token in an httpOnly cookie, never the password.
-
-## Run locally
-
-```bash
-npm install
-cp .env.example .env        # fill in DATABASE_URL (+ RESEND_API_KEY, ADMIN_PASSWORD)
-npm run db:push             # create the table in your database
-npm run dev                 # http://localhost:3000  (admin at /admin)
-```
-
-Without `RESEND_API_KEY` the app still works — it just logs "skipping email"
-instead of sending, so you can develop without a mail provider.
-
-## Deploy to Vercel
-
-1. Push this repo to GitHub and import it in Vercel.
-2. Create a free **Supabase** project. Copy the pooled connection string
-   (Settings → Database → Connection string → URI, port 6543) into a Vercel env
-   var `DATABASE_URL`.
-3. Add `RESEND_API_KEY`, `EMAIL_FROM`, `ADMIN_PASSWORD`, and `ADMIN_SECRET` in
-   Vercel → Settings → Environment Variables (Production + Preview).
-4. Create the table once: run `npm run db:push` locally against the same
-   `DATABASE_URL`, or `npx prisma migrate deploy` in a build step.
-5. Deploy. The form is at `/`, the admin view at `/admin`.
 
 ## Layout
 

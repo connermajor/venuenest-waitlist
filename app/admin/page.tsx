@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { ADMIN_COOKIE, isAuthed } from "@/lib/auth";
 import { login, logout } from "./actions";
+import AdminTable from "./admin-table";
 
 export const dynamic = "force-dynamic";
 
@@ -60,6 +61,16 @@ export default async function AdminPage({
   startOfToday.setHours(0, 0, 0, 0);
   const today = entries.filter((e) => e.createdAt >= startOfToday).length;
 
+  // Serializable rows for the client table. Position is the true 1-based place
+  // in the oldest-first list, so it stays meaningful even when the list is filtered.
+  const rows = entries.map((e, i) => ({
+    id: e.id,
+    position: i + 1,
+    email: e.email,
+    name: e.name,
+    joined: e.createdAt.toISOString().slice(0, 10),
+  }));
+
   return (
     <main className="min-h-screen bg-cream px-6 py-10">
       <div className="mx-auto max-w-4xl">
@@ -91,38 +102,7 @@ export default async function AdminPage({
           <Stat label="Today" value={today.toLocaleString()} />
         </div>
 
-        <div className="mt-6 overflow-hidden rounded-lg border border-neutral-200 bg-white">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-neutral-200 bg-neutral-50 text-xs uppercase tracking-wide text-neutral-500">
-                <th className="px-4 py-2.5 font-medium">#</th>
-                <th className="px-4 py-2.5 font-medium">Email</th>
-                <th className="px-4 py-2.5 font-medium">Name</th>
-                <th className="px-4 py-2.5 font-medium">Joined</th>
-              </tr>
-            </thead>
-            <tbody>
-              {entries.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="px-4 py-10 text-center text-neutral-500">
-                    No signups yet.
-                  </td>
-                </tr>
-              ) : (
-                entries.map((e, i) => (
-                  <tr key={e.id} className="border-b border-neutral-100 last:border-0">
-                    <td className="px-4 py-2.5 font-mono text-neutral-500">{i + 1}</td>
-                    <td className="px-4 py-2.5 text-neutral-900">{e.email}</td>
-                    <td className="px-4 py-2.5 text-neutral-500">{e.name ?? "—"}</td>
-                    <td className="px-4 py-2.5 font-mono text-neutral-500">
-                      {e.createdAt.toISOString().slice(0, 10)}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <AdminTable entries={rows} />
       </div>
     </main>
   );

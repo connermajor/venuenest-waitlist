@@ -43,7 +43,7 @@ export default function WaitlistForm() {
 
   if (status === "ok" || status === "already") {
     return (
-      <div className="py-2">
+      <div className="py-2" role="status" aria-live="polite">
         <span className="inline-flex items-center gap-1.5 rounded-full border border-sage-line bg-sage-tint px-2.5 py-1 text-xs font-medium text-sage-deep">
           <span className="h-1.5 w-1.5 rounded-full bg-sage-deep" />
           {status === "already" ? "Already on the list" : "You're in"}
@@ -90,6 +90,8 @@ export default function WaitlistForm() {
           required
           autoComplete="email"
           placeholder="you@example.com"
+          aria-invalid={status === "error"}
+          aria-describedby={status === "error" ? "form-error" : undefined}
           className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2.5 text-ink placeholder-neutral-400 outline-none transition-colors focus:border-sage"
         />
       </div>
@@ -101,7 +103,7 @@ export default function WaitlistForm() {
       </div>
 
       {status === "error" && (
-        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p id="form-error" role="alert" className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
           {message}
         </p>
       )}

@@ -34,8 +34,10 @@ row appear in the admin table with its waitlist position.
 - Waitlist **position** returned on signup and shown in the UI + email.
 - **Idempotent** signups: a repeat email returns the existing position, no error.
 - **Honeypot** field + a best-effort **rate limit** to blunt bot spam.
-- **CSV export** from the admin view.
+- **CSV export** and **instant search** (by email or name) in the admin view.
 - Admin auth stores a **hashed** token in an httpOnly cookie, never the password.
+- **Accessible form**: live-announced status, `role="alert"` errors, labelled inputs.
+- **`/api/health`** endpoint (pings the DB) for uptime monitors and load balancers.
 
 ## Layout
 
@@ -43,10 +45,12 @@ row appear in the admin table with its waitlist position.
 app/
   page.tsx              landing + form (server component, live count)
   waitlist-form.tsx     the form (client component)
-  admin/page.tsx        password-gated signups table
+  admin/page.tsx        password-gated dashboard (stats + table)
+  admin/admin-table.tsx client table with instant search
   admin/actions.ts      login / logout server actions
   api/waitlist/route.ts POST signup (validate, store, email, position)
   api/admin/export      CSV export (cookie-guarded)
+  api/health            DB health check
 lib/
   prisma.ts   validation.ts   email.ts   auth.ts   rate-limit.ts
 prisma/schema.prisma    WaitlistEntry model

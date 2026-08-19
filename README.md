@@ -17,7 +17,7 @@ row appear in the admin table with its waitlist position.
 ## Stack
 
 - **Next.js 15** (App Router) + **TypeScript** + **React 19**
-- **Tailwind CSS v4** — styled in VenueNest's brand: sage green, their pink for the CTA, serif headings on a warm cream ground
+- **Tailwind CSS v4** — styled in VenueNest's brand: sage green with a forest-green CTA, serif headings on a warm cream ground
 - **Prisma** + **PostgreSQL** (mirrors the VenueNest NestJS/Prisma/Postgres stack)
 - **Resend** for transactional email
 - **Zod** for input validation

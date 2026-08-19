@@ -16,8 +16,8 @@
   --color-sage-deep: #5f7049; /* readable sage for text/accents */
   --color-sage-tint: #f2f5ec; /* pale sage surface */
   --color-sage-line: #d7e0c9; /* sage border */
-  --color-blush: #ed1566; /* official VenueNest pink (CTA) */
-  --color-blush-deep: #cf1259; /* pink hover */
+  --color-forest: #3a5a40; /* forest-green CTA, complements the sage */
+  --color-forest-deep: #2f4a34; /* forest hover */
 }
 
 /* Warm off-white ground with near-black text, the same palette as the

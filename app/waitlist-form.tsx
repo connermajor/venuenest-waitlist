@@ -109,7 +109,7 @@ export default function WaitlistForm() {
       <button
         type="submit"
         disabled={status === "loading"}
-        className="w-full rounded-md bg-blush px-4 py-2.5 font-medium text-white transition-colors hover:bg-blush-deep disabled:cursor-not-allowed disabled:opacity-60"
+        className="w-full rounded-md bg-forest px-4 py-2.5 font-medium text-white transition-colors hover:bg-forest-deep disabled:cursor-not-allowed disabled:opacity-60"
       >
         {status === "loading" ? "Joining…" : "Join the waitlist"}
       </button>

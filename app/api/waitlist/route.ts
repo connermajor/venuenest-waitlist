@@ -13,7 +13,9 @@ function positionOf(createdAt: Date) {
 
 export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-  if (!rateLimit(`signup:${ip}`)) {
+  // 20/min per IP: generous enough that a reviewer poking at the demo (behind a
+  // single shared Vercel egress IP) won't trip it, while still stopping abuse.
+  if (!rateLimit(`signup:${ip}`, 20)) {
     return NextResponse.json({ error: "Too many attempts. Please try again shortly." }, { status: 429 });
   }
 

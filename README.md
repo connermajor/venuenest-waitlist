@@ -1,5 +1,7 @@
 # VenueNest Waitlist
 
+[![CI](https://github.com/connermajor/venuenest-waitlist/actions/workflows/ci.yml/badge.svg)](https://github.com/connermajor/venuenest-waitlist/actions/workflows/ci.yml)
+
 A small, production-shaped waitlist tool: a signup form, Postgres storage, an
 admin view, and a confirmation email on signup.
 
@@ -15,7 +17,7 @@ row appear in the admin table with its waitlist position.
 ## Stack
 
 - **Next.js 15** (App Router) + **TypeScript** + **React 19**
-- **Tailwind CSS v4**, Geist typeface — monochrome, borders-over-shadows
+- **Tailwind CSS v4** — styled in VenueNest's brand: sage green, their pink for the CTA, serif headings on a warm cream ground
 - **Prisma** + **PostgreSQL** (mirrors the VenueNest NestJS/Prisma/Postgres stack)
 - **Resend** for transactional email
 - **Zod** for input validation
@@ -49,3 +51,7 @@ lib/
   prisma.ts   validation.ts   email.ts   auth.ts   rate-limit.ts
 prisma/schema.prisma    WaitlistEntry model
 ```
+
+## License
+
+MIT — see [LICENSE](LICENSE).

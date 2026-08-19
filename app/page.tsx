@@ -14,32 +14,33 @@ export default async function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-neutral-50 flex items-center justify-center px-6 py-16">
+    <main className="flex min-h-screen items-center justify-center bg-cream px-6 py-16">
       <div className="w-full max-w-md">
         <div className="mb-8">
           <div className="flex items-center gap-2.5">
-            <Image src={logo} alt="VenueNest" width={40} height={30} priority />
-            <span className="text-sm font-mono font-medium tracking-tight text-neutral-900">
+            <Image src={logo} alt="VenueNest" width={44} height={34} priority />
+            <span className="font-serif text-base uppercase tracking-[0.22em] text-ink">
               VenueNest
             </span>
           </div>
-          <h1 className="mt-8 text-3xl font-semibold tracking-tight text-neutral-900">
+          <h1 className="mt-9 font-serif text-4xl tracking-tight text-ink">
             Join the waitlist
           </h1>
-          <p className="mt-3 leading-relaxed text-neutral-500">
-            Book and manage venues without the endless back-and-forth. Leave your
-            email and we&apos;ll let you in as spots open up.
+          <p className="mt-3 leading-relaxed text-[#6e6e6e]">
+            VenueNest is the software that runs your whole wedding venue, from the
+            first inquiry to the last dance. Leave your email and we&apos;ll let you
+            in as spots open up.
           </p>
         </div>
 
-        <div className="rounded-lg border border-neutral-200 bg-white p-6">
+        <div className="rounded-2xl border border-[#ecece3] bg-white p-7 shadow-sm">
           <WaitlistForm />
         </div>
 
-        <div className="mt-4 flex items-center justify-between text-sm text-neutral-500">
+        <div className="mt-4 flex items-center justify-between text-sm text-[#8f8f8f]">
           <span>We&apos;ll only email you about your spot.</span>
           {count > 0 && (
-            <span className="font-mono text-neutral-900">
+            <span className="font-mono text-sage-deep">
               {count.toLocaleString()} in line
             </span>
           )}

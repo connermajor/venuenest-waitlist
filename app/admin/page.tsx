@@ -7,9 +7,9 @@ export const dynamic = "force-dynamic";
 
 function LoginScreen({ error }: { error: boolean }) {
   return (
-    <main className="min-h-screen bg-neutral-50 flex items-center justify-center px-6">
-      <form action={login} className="w-full max-w-sm rounded-lg border border-neutral-200 bg-white p-6">
-        <h1 className="text-lg font-semibold text-neutral-900">Admin access</h1>
+    <main className="min-h-screen bg-cream flex items-center justify-center px-6">
+      <form action={login} className="w-full max-w-sm rounded-2xl border border-[#ecece3] bg-white p-6 shadow-sm">
+        <h1 className="font-serif text-xl text-ink">Admin access</h1>
         <p className="mt-1 text-sm text-neutral-500">Enter the admin password to view signups.</p>
         <input
           name="password"
@@ -25,7 +25,7 @@ function LoginScreen({ error }: { error: boolean }) {
         )}
         <button
           type="submit"
-          className="mt-4 w-full rounded-md bg-neutral-900 px-4 py-2.5 font-medium text-white transition-colors hover:bg-neutral-800"
+          className="mt-4 w-full rounded-md bg-[#5f7049] px-4 py-2.5 font-medium text-white transition-colors hover:bg-[#4e5d3b]"
         >
           Sign in
         </button>
@@ -61,12 +61,12 @@ export default async function AdminPage({
   const today = entries.filter((e) => e.createdAt >= startOfToday).length;
 
   return (
-    <main className="min-h-screen bg-neutral-50 px-6 py-10">
+    <main className="min-h-screen bg-cream px-6 py-10">
       <div className="mx-auto max-w-4xl">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-semibold tracking-tight text-neutral-900">Waitlist</h1>
-            <p className="mt-1 text-sm text-neutral-500">Everyone who has signed up, oldest first.</p>
+            <h1 className="font-serif text-2xl text-ink">Waitlist</h1>
+            <p className="mt-1 text-sm text-[#6e6e6e]">Everyone who has signed up, oldest first.</p>
           </div>
           <div className="flex items-center gap-2">
             <a

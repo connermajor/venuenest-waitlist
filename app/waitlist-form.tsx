@@ -44,20 +44,20 @@ export default function WaitlistForm() {
   if (status === "ok" || status === "already") {
     return (
       <div className="py-2">
-        <span className="inline-flex items-center gap-1.5 rounded-md border border-green-200 bg-green-50 px-2 py-1 text-xs font-medium text-green-700">
-          <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-sage-line bg-sage-tint px-2.5 py-1 text-xs font-medium text-sage-deep">
+          <span className="h-1.5 w-1.5 rounded-full bg-sage-deep" />
           {status === "already" ? "Already on the list" : "You're in"}
         </span>
-        <h2 className="mt-4 text-lg font-semibold text-neutral-900">
+        <h2 className="mt-4 font-serif text-2xl text-ink">
           {status === "already" ? "You were already signed up" : "You're on the list"}
         </h2>
         {position ? (
-          <p className="mt-1.5 text-neutral-500">
-            You&apos;re <span className="font-mono text-neutral-900">#{position}</span> in
+          <p className="mt-2 text-[#6e6e6e]">
+            You&apos;re <span className="font-mono text-sage-deep">#{position}</span> in
             line. We sent a confirmation to your inbox.
           </p>
         ) : (
-          <p className="mt-1.5 text-neutral-500">We sent a confirmation to your inbox.</p>
+          <p className="mt-2 text-[#6e6e6e]">We sent a confirmation to your inbox.</p>
         )}
       </div>
     );
@@ -66,7 +66,7 @@ export default function WaitlistForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-4" noValidate>
       <div>
-        <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-neutral-900">
+        <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-ink">
           Name <span className="font-normal text-neutral-400">(optional)</span>
         </label>
         <input
@@ -75,12 +75,12 @@ export default function WaitlistForm() {
           type="text"
           autoComplete="name"
           placeholder="Jordan Rivera"
-          className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-neutral-900 placeholder-neutral-400 outline-none transition-colors focus:border-neutral-900"
+          className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2.5 text-ink placeholder-neutral-400 outline-none transition-colors focus:border-sage"
         />
       </div>
 
       <div>
-        <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-neutral-900">
+        <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-ink">
           Email
         </label>
         <input
@@ -90,7 +90,7 @@ export default function WaitlistForm() {
           required
           autoComplete="email"
           placeholder="you@example.com"
-          className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-neutral-900 placeholder-neutral-400 outline-none transition-colors focus:border-neutral-900"
+          className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2.5 text-ink placeholder-neutral-400 outline-none transition-colors focus:border-sage"
         />
       </div>
 
@@ -109,7 +109,7 @@ export default function WaitlistForm() {
       <button
         type="submit"
         disabled={status === "loading"}
-        className="w-full rounded-md bg-neutral-900 px-4 py-2.5 font-medium text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-60"
+        className="w-full rounded-md bg-blush px-4 py-2.5 font-medium text-white transition-colors hover:bg-blush-deep disabled:cursor-not-allowed disabled:opacity-60"
       >
         {status === "loading" ? "Joining…" : "Join the waitlist"}
       </button>

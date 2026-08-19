@@ -1,8 +1,14 @@
 node_modules
 .next
 out
-.env
-.env*.local
 .DS_Store
 *.log
 /prisma/*.db
+.vercel
+
+# Env files: never commit real secrets (.env.example is committed)
+.env
+.env*
+
+# Build artifacts
+*.tsbuildinfo

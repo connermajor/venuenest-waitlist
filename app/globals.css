@@ -1,16 +1,29 @@
 @import "tailwindcss";
 
 /* Map the Geist font variables (loaded in layout.tsx via next/font) onto
-   Tailwind's font-sans / font-mono utilities. Geist Mono is for any number
-   the eye compares in a column. */
+   Tailwind's font-sans / font-mono utilities, and add a serif for the
+   headings so the brand reads warm and editorial like the emails.
+   VenueNest brand palette: sage green primary, their pink for the CTA,
+   warm off-white ground, near-black ink. */
 @theme {
   --font-sans: var(--font-geist-sans), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-serif: Georgia, "Times New Roman", serif;
+
+  --color-cream: #f7f6f1; /* warm page ground */
+  --color-ink: #2e2e2a; /* near-black headings */
+  --color-sage: #a9b89a; /* official VenueNest sage */
+  --color-sage-deep: #5f7049; /* readable sage for text/accents */
+  --color-sage-tint: #f2f5ec; /* pale sage surface */
+  --color-sage-line: #d7e0c9; /* sage border */
+  --color-blush: #ed1566; /* official VenueNest pink (CTA) */
+  --color-blush-deep: #cf1259; /* pink hover */
 }
 
-/* Two backgrounds, not five: white primary surface, neutral-50 secondary. */
+/* Warm off-white ground with near-black text, the same palette as the
+   confirmation email. */
 body {
-  background-color: #ffffff;
-  color: var(--color-neutral-900);
+  background-color: var(--color-cream);
+  color: var(--color-ink);
   font-family: var(--font-sans);
 }

@@ -4,8 +4,23 @@ import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://venuenest-waitlist-three.vercel.app"),
   title: "VenueNest — Join the Waitlist",
-  description: "Book and manage venues without the back-and-forth. Join the VenueNest waitlist.",
+  description:
+    "VenueNest is the software that runs your whole wedding venue. Join the waitlist and we'll let you in as spots open up.",
+  openGraph: {
+    title: "VenueNest — Join the Waitlist",
+    description:
+      "The software that runs your whole wedding venue. Join the waitlist and we'll let you in as spots open up.",
+    url: "/",
+    siteName: "VenueNest",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "VenueNest — Join the Waitlist",
+    description: "The software that runs your whole wedding venue. Join the waitlist.",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

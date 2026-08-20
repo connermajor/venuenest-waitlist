@@ -31,6 +31,23 @@ The password above is the owner password. Under the hood the app is multi-tenant
 a waitlist can be given its own optional password that signs that person in scoped
 to just their own list, enforced down to the CSV export.
 
+## Verifying The Email
+
+Both emails (the signup confirmation and the "your spot is ready" note) send
+through the official Resend SDK, in [lib/email.ts](lib/email.ts). Two things worth
+knowing when you test it:
+
+- This demo runs on Resend's free tier with their shared `onboarding@resend.dev`
+  sender and no custom domain. In that mode Resend only delivers to the account
+  owner's own verified address, so if you sign up with your own email the row is
+  created but the message will not land in your inbox. That is a Resend free-tier
+  restriction, not an app bug. Verifying a domain and setting `EMAIL_FROM` makes it
+  deliver to anyone, with no code change.
+- You can still watch the whole pipeline work in the admin. Each row carries an
+  email-status badge that moves from sent to delivered to opened as real Resend
+  webhooks arrive, and the Invited Guests tab already has a row with a real
+  `delivered` badge from an actual send.
+
 ## Decision Log
 
 I built the core first and got it working end to end, then layered the bonuses on.

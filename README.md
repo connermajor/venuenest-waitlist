@@ -37,13 +37,14 @@ Both emails (the signup confirmation and the "your spot is ready" note) send
 through the official Resend SDK, in [lib/email.ts](lib/email.ts). Two things worth
 knowing when you test it:
 
-- This demo runs on Resend's free tier with their shared `onboarding@resend.dev`
-  sender and no custom domain. In that mode Resend only delivers to the account
-  owner's own verified address, so if you sign up with your own email the row is
-  created but the message will not land in your inbox. That is a Resend free-tier
-  restriction, not an app bug. Verifying a domain and setting `EMAIL_FROM` makes it
-  deliver to anyone, with no code change.
-- You can still watch the whole pipeline work in the admin. Each row carries an
+- The live demo sends from a custom domain I verified in Resend, with the SPF and
+  DKIM DNS records in place, so confirmation emails deliver to whatever address you
+  enter on the form. Sign up on the live app and the email lands in your inbox. This
+  is worth calling out because Resend's default setup is deliberately limited: with
+  no verified domain you can only send from the shared `onboarding@resend.dev`
+  address, and it only delivers to the account owner's own verified email. Verifying
+  a domain and setting `EMAIL_FROM` is what lifts both limits, with no code change.
+- You can also watch the whole pipeline work in the admin. Each row carries an
   email-status badge that moves from sent to delivered to opened as real Resend
   webhooks arrive, and the Invited Guests tab already has a row with a real
   `delivered` badge from an actual send.

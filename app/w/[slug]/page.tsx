@@ -51,7 +51,7 @@ export default async function ProjectWaitlist({
         <div className="mt-4 flex items-center justify-between text-sm text-[#8f8f8f]">
           <span>We&apos;ll only email you about your spot.</span>
           {count > 0 && (
-            <span className="font-mono text-sage-deep">
+            <span className="font-script text-2xl leading-none text-sage-deep">
               {count.toLocaleString()} in line
             </span>
           )}

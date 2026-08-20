@@ -25,4 +25,7 @@ export const slugSchema = z
 export const createProjectSchema = z.object({
   name: z.string().trim().min(1, "Enter a project name.").max(120),
   slug: slugSchema,
+  // Optional per-project admin password. When set, someone with this password
+  // can sign in to see only this project's waitlist.
+  password: z.string().min(6, "Use at least 6 characters.").max(200).optional().or(z.literal("")),
 });

@@ -70,14 +70,14 @@ export default function WaitlistForm({ slug }: { slug?: string }) {
     <form onSubmit={onSubmit} className="space-y-4" noValidate>
       <div>
         <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-ink">
-          Name <span className="font-normal text-neutral-400">(optional)</span>
+          Name
         </label>
         <input
           id="name"
           name="name"
           type="text"
           autoComplete="name"
-          placeholder="Jordan Rivera"
+          placeholder="John Doe"
           className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2.5 text-ink placeholder-neutral-400 outline-none transition-colors focus:border-sage"
         />
       </div>

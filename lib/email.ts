@@ -42,7 +42,7 @@ export async function sendConfirmationEmail({ to, name, position }: Confirmation
               <div style="font-family:${SERIF};font-size:34px;color:#5f7049;padding-top:4px;">#${position}</div>
             </td></tr></table>
           </td></tr></table>
-          <p style="margin:0;font-family:${SERIF};font-size:16px;line-height:1.6;color:#4a4a44;text-align:center;">We'll email you the moment your spot opens. Nothing else is needed for now.</p>
+          <p style="margin:0;font-family:${SERIF};font-size:16px;line-height:1.6;color:#4a4a44;text-align:center;">We'll email you the moment your spot opens.</p>
         </td></tr>
         <tr><td align="center" style="padding:26px 20px 0;">
           <p style="margin:0;font-family:${SERIF};font-size:13px;line-height:1.6;color:#a3a39a;font-style:italic;">The software that runs your whole venue, from first inquiry to last dance.</p>

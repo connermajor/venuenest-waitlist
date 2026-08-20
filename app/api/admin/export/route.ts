@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
-import { ADMIN_COOKIE, isAuthed } from "@/lib/auth";
+import { ADMIN_COOKIE, OWNER_SCOPE, verifyScope } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +13,8 @@ function csvCell(v: string): string {
 
 export async function GET(req: NextRequest) {
   const store = await cookies();
-  if (!isAuthed(store.get(ADMIN_COOKIE)?.value)) {
+  const scope = verifyScope(store.get(ADMIN_COOKIE)?.value);
+  if (!scope) {
     return new Response("Unauthorized", { status: 401 });
   }
 
@@ -21,6 +22,11 @@ export async function GET(req: NextRequest) {
   const project = await prisma.project.findUnique({ where: { slug } });
   if (!project) {
     return new Response("Not found", { status: 404 });
+  }
+
+  // A project-scoped session can only export its own list; the owner exports any.
+  if (scope !== OWNER_SCOPE && scope !== project.id) {
+    return new Response("Forbidden", { status: 403 });
   }
 
   const rows = await prisma.waitlistEntry.findMany({

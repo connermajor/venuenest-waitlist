@@ -8,10 +8,11 @@ datasource db {
 }
 
 model Project {
-  id        String   @id @default(cuid())
-  slug      String   @unique
-  name      String
-  createdAt DateTime @default(now())
+  id               String   @id @default(cuid())
+  slug             String   @unique
+  name             String
+  adminPasswordHash String?
+  createdAt        DateTime @default(now())
 
   entries WaitlistEntry[]
 

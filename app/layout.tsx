@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
-import { Great_Vibes } from "next/font/google";
+import { Dancing_Script } from "next/font/google";
 import "./globals.css";
 
-// A wedding-invitation script, used for small flourishes like the live
-// "N in line" count. Self-hosted by next/font at build time (no runtime fetch).
-const greatVibes = Great_Vibes({
-  weight: "400",
+// A soft wedding script used for small flourishes like the live "N in line"
+// count. Dancing Script keeps the hand-lettered feel but stays legible.
+// Self-hosted by next/font at build time (no runtime fetch).
+const script = Dancing_Script({
+  weight: "600",
   subsets: ["latin"],
   variable: "--font-script",
   display: "swap",
@@ -35,7 +36,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable} ${greatVibes.variable}`}>
+    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable} ${script.variable}`}>
       <body className="antialiased">{children}</body>
     </html>
   );

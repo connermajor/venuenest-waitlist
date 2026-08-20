@@ -2,7 +2,6 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
   ADMIN_COOKIE,
@@ -11,7 +10,7 @@ import {
   verifyScope,
   hashWithSecret,
 } from "@/lib/auth";
-import { createProjectSchema } from "@/lib/validation";
+import { sendReadyEmail as sendReadyMail } from "@/lib/email";
 
 type Store = Awaited<ReturnType<typeof cookies>>;
 
@@ -57,37 +56,31 @@ export async function logout() {
   redirect("/admin");
 }
 
-// Creates a new waitlist (tenant). Owner-only. An optional password lets that
-// project's own admin sign in scoped to just their list.
-export async function createProject(formData: FormData) {
+// Sends the "your spot is ready" email to one waitlist entry and moves them off
+// the active list by stamping invitedAt. Scope-guarded: the owner can invite on
+// any list; a project-scoped admin can only invite from their own list.
+export async function sendReadyEmail(formData: FormData) {
+  const id = String(formData.get("id") ?? "");
   const store = await cookies();
-  if (verifyScope(store.get(ADMIN_COOKIE)?.value) !== OWNER_SCOPE) redirect("/admin");
+  const scope = verifyScope(store.get(ADMIN_COOKIE)?.value);
+  if (!scope) redirect("/admin?error=1");
 
-  const parsed = createProjectSchema.safeParse({
-    name: String(formData.get("name") ?? ""),
-    slug: String(formData.get("slug") ?? ""),
-    password: String(formData.get("password") ?? ""),
+  const entry = await prisma.waitlistEntry.findUnique({ where: { id } });
+  if (!entry) redirect("/admin");
+  if (scope !== OWNER_SCOPE && scope !== entry.projectId) redirect("/admin");
+  if (entry.invitedAt) redirect("/admin"); // already invited — nothing to do
+
+  const messageId = await sendReadyMail({ to: entry.email, name: entry.name });
+
+  await prisma.waitlistEntry.update({
+    where: { id: entry.id },
+    data: {
+      invitedAt: new Date(),
+      ...(messageId
+        ? { emailId: messageId, emailStatus: "sent", emailUpdatedAt: new Date() }
+        : {}),
+    },
   });
-  if (!parsed.success) {
-    redirect("/admin?perror=1");
-  }
 
-  const data: { name: string; slug: string; adminPasswordHash?: string } = {
-    name: parsed.data.name,
-    slug: parsed.data.slug,
-  };
-  if (parsed.data.password) {
-    data.adminPasswordHash = hashWithSecret(parsed.data.password);
-  }
-
-  try {
-    await prisma.project.create({ data });
-  } catch (err) {
-    // Slug already taken.
-    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
-      redirect("/admin?perror=taken");
-    }
-    throw err;
-  }
-  redirect(`/admin?project=${parsed.data.slug}`);
+  redirect("/admin");
 }

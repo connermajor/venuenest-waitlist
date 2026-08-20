@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useFormStatus } from "react-dom";
+import { sendReadyEmail } from "./actions";
 
 export type AdminRow = {
   id: string;
@@ -8,6 +10,7 @@ export type AdminRow = {
   email: string;
   name: string | null;
   joined: string;
+  invited: string | null;
   emailStatus: string | null;
 };
 
@@ -33,7 +36,33 @@ function StatusBadge({ status }: { status: string | null }) {
   );
 }
 
-export default function AdminTable({ entries }: { entries: AdminRow[] }) {
+// Submit button for the inline "send ready email" form; shows a pending state
+// while the server action runs.
+function ReadyButton({ email }: { email: string }) {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      onClick={(e) => {
+        if (!confirm(`Send the "your spot is ready" email to ${email} and move them to Invited Guests?`)) {
+          e.preventDefault();
+        }
+      }}
+      className="rounded-md border border-sage-line bg-sage-tint px-2.5 py-1 text-xs font-medium text-sage-deep transition-colors hover:bg-sage-line/40 disabled:opacity-50"
+    >
+      {pending ? "Sending…" : "Send ready email"}
+    </button>
+  );
+}
+
+export default function AdminTable({
+  entries,
+  view,
+}: {
+  entries: AdminRow[];
+  view: "current" | "invited";
+}) {
   const [q, setQ] = useState("");
   const query = q.trim().toLowerCase();
   const filtered = query
@@ -43,6 +72,10 @@ export default function AdminTable({ entries }: { entries: AdminRow[] }) {
           (e.name?.toLowerCase().includes(query) ?? false),
       )
     : entries;
+
+  const isInvited = view === "invited";
+  const cols = isInvited ? 5 : 6;
+  const emptyMsg = isInvited ? "No invited guests yet." : "No one waiting right now.";
 
   return (
     <div>
@@ -68,19 +101,20 @@ export default function AdminTable({ entries }: { entries: AdminRow[] }) {
               <th className="px-4 py-2.5 font-medium">Email</th>
               <th className="px-4 py-2.5 font-medium">Name</th>
               <th className="px-4 py-2.5 font-medium">Email status</th>
-              <th className="px-4 py-2.5 font-medium">Joined</th>
+              <th className="px-4 py-2.5 font-medium">{isInvited ? "Invited" : "Joined"}</th>
+              {!isInvited && <th className="px-4 py-2.5 font-medium"></th>}
             </tr>
           </thead>
           <tbody>
             {entries.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-10 text-center text-neutral-500">
-                  No signups yet.
+                <td colSpan={cols} className="px-4 py-10 text-center text-neutral-500">
+                  {emptyMsg}
                 </td>
               </tr>
             ) : filtered.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-10 text-center text-neutral-500">
+                <td colSpan={cols} className="px-4 py-10 text-center text-neutral-500">
                   No matches for &ldquo;{q.trim()}&rdquo;.
                 </td>
               </tr>
@@ -91,7 +125,17 @@ export default function AdminTable({ entries }: { entries: AdminRow[] }) {
                   <td className="px-4 py-2.5 text-neutral-900">{e.email}</td>
                   <td className="px-4 py-2.5 text-neutral-500">{e.name ?? "—"}</td>
                   <td className="px-4 py-2.5"><StatusBadge status={e.emailStatus} /></td>
-                  <td className="px-4 py-2.5 font-mono text-neutral-500">{e.joined}</td>
+                  <td className="px-4 py-2.5 font-mono text-neutral-500">
+                    {isInvited ? (e.invited ?? "—") : e.joined}
+                  </td>
+                  {!isInvited && (
+                    <td className="px-4 py-2.5 text-right">
+                      <form action={sendReadyEmail}>
+                        <input type="hidden" name="id" value={e.id} />
+                        <ReadyButton email={e.email} />
+                      </form>
+                    </td>
+                  )}
                 </tr>
               ))
             )}

@@ -17,17 +17,42 @@ waitlist position.
 
 Once you are signed in, the admin lets you:
 
-- See every signup with its position, plus totals for all-time and today.
-- Switch between waitlists with per-project tabs (this is a multi-tenant app).
+- See everyone still waiting, with their position, plus Waiting and Invited totals.
+- Toggle between the **Current Waitlist** (still waiting) and **Invited Guests**
+  (already sent their turn).
+- **Send a "your spot is ready" email** to anyone waiting, which moves them off the
+  current list into Invited Guests.
 - Search signups instantly by name or email.
-- Export any list to CSV.
+- Export the list to CSV.
 - See a live email-status badge per row (sent, delivered, bounced, opened) once
   the Resend webhook is wired.
-- Create a new waitlist, with an optional password for that list.
 
-The password above is the owner password, so it sees every waitlist. Each waitlist
-can also be given its own optional password, which signs that person in scoped to
-just their own list.
+The password above is the owner password. Under the hood the app is multi-tenant:
+a waitlist can be given its own optional password that signs that person in scoped
+to just their own list, enforced down to the CSV export.
+
+## Decision Log
+
+I built the core first and got it working end to end, then layered the bonuses on.
+
+**Planned vs. shipped.** The core (signup form, Postgres storage, admin view, a real
+confirmation email, deployed to Vercel free tiers) shipped and I verified it end to
+end. All five bonuses shipped too: waitlist position with idempotent repeat signups;
+admin auth as a signed, hashed httpOnly cookie (never the password), scoped so the
+owner sees every list and a per-project password sees only its own; multi-tenancy
+scoped per project; Resend webhooks recording delivered/bounced/opened; plus a
+honeypot, a rate limit, a health check, CI, and 34 unit tests.
+
+**Where I got stuck.** Migrating the live table to multi-tenancy without dropping
+existing rows: you cannot add a required foreign key to a populated table, so I did
+it in phases (nullable column, backfill a default project onto every row, check for
+orphans, then make it required). Neon also hands you two connection strings and I
+used the wrong one at first: schema changes need the direct non-pooling URL, since
+the pooled one just hangs on a push. I split them so each job uses the right one.
+
+**With more time.** Move the rate limiter to a durable store like Upstash, add double
+opt-in and an unsubscribe link, add an admin audit trail on top of the scoped auth,
+and add integration tests against a test database.
 
 ## Stack
 
@@ -49,8 +74,7 @@ just their own list.
 - Waitlist **position** returned on signup and shown in the UI + email.
 - **Idempotent** signups: a repeat email returns the existing position, no error.
 - **Multi-tenancy**: independent waitlists (projects). `/` is the primary list;
-  `/w/[slug]` is any other list; the admin has per-project tabs, CSV, and a
-  create-project form. Position and uniqueness are scoped per project.
+  `/w/[slug]` is any other list. Position and uniqueness are scoped per project.
 - **Scoped admin auth**: the owner password sees every list; an optional
   per-project password scopes a session to just that one waitlist. The session
   is a signed, hashed httpOnly cookie, never the password itself.
@@ -69,9 +93,9 @@ app/
   page.tsx              landing + form (server component, live count)
   waitlist-form.tsx     the form (client component)
   w/[slug]/page.tsx     per-project waitlist page (multi-tenant)
-  admin/page.tsx        password-gated dashboard (project tabs, stats, table)
+  admin/page.tsx        password-gated dashboard (current/invited toggle, stats)
   admin/admin-table.tsx client table with instant search + email-status badges
-  admin/actions.ts      login / logout / create-project server actions
+  admin/actions.ts      login / logout / send-ready-email server actions
   api/waitlist/route.ts POST signup (validate, store, email, position, per-project)
   api/admin/export      CSV export per project (cookie-guarded)
   api/webhooks/resend   Svix-verified delivery/bounce/open webhook
@@ -84,62 +108,3 @@ prisma/schema.prisma    Project + WaitlistEntry models
 ## License
 
 MIT, see [LICENSE](LICENSE).
-
-## Decision Log
-
-I built the core first and got it working end to end, then added the bonuses on
-top of it. Here is what I planned, what I actually shipped, where I got stuck,
-and what I would do next.
-
-### What I Planned vs. What I Shipped
-
-The core plan was a signup form for name and email, Postgres storage, an admin
-view, and a real confirmation email, all deployed to Vercel on free tiers. That
-all shipped and I verified it end to end.
-
-On top of the core I shipped all five optional bonuses, plus a little more:
-
-- Waitlist position on signup, shown in both the UI and the email. Repeat
-  signups are idempotent, so the same email gets the same position back instead
-  of an error.
-- Admin auth that stores a signed, hashed session in an httpOnly cookie and never
-  the password itself. I took this a step past the brief: the session is scoped,
-  so the owner password sees every list and an optional per-project password only
-  sees its own waitlist. That scope is enforced on the CSV export too.
-- Multi-tenancy. Each waitlist is a project, and email uniqueness and position
-  are scoped per project. The homepage is the primary list and `/w/[slug]` serves
-  any other one.
-- Resend webhooks. I store the message id when the email sends, then a
-  signature-verified webhook records delivered, bounced, complained, and opened
-  status back onto each row. The admin shows it as a badge.
-- Better error and loading states, with an accessible form (live-announced
-  status, an alert on errors, labelled inputs).
-- Real-world hardening: a honeypot field, a per-IP rate limit, a `/api/health`
-  check, GitHub Actions CI, and 34 unit tests.
-
-### Where I Got Stuck, And How I Got Unstuck
-
-- Migrating the live table to multi-tenancy without dropping the signups already
-  in it. You cannot add a required foreign key to a table that already has rows.
-  I did it in phases instead: added the column as nullable, ran a backfill that
-  created a default project and attached every existing row to it, checked there
-  were no orphans left, then made the column required.
-- Neon gives you two connection strings and I used the wrong one at first. Schema
-  changes need the direct, non-pooling URL, and the pooled one is for the app at
-  runtime. The pooled one just hangs on a schema push. I split them so each job
-  uses the right one.
-- A rate-limit test kept failing on my machine for the wrong reason. Vercel
-  replaces `x-forwarded-for` with the real client IP, so every request from one
-  machine looked like the same IP. Once I understood that, I keyed the limiter on
-  that header on purpose and pointed the test at the library default.
-
-### What I Would Do With More Time
-
-- Move the rate limiter to a durable store like Upstash so it survives cold
-  starts and works across instances.
-- Add double opt-in and an unsubscribe link, which a real waitlist needs for
-  deliverability and compliance.
-- Add an admin audit trail (who signed in, who exported) on top of the scoped
-  auth that is already in place.
-- Add integration tests around the API route and the webhook with a test
-  database, not just unit tests on the pure functions.

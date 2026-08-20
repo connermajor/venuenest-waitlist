@@ -29,6 +29,7 @@ model WaitlistEntry {
   emailId        String?
   emailStatus    String?
   emailUpdatedAt DateTime?
+  invitedAt      DateTime? // set when the "your spot is ready" email is sent; moves them off the active list
   createdAt      DateTime  @default(now())
 
   @@unique([projectId, email])

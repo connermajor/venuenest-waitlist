@@ -51,6 +51,19 @@ function LoginScreen({ error }: { error: boolean }) {
           </button>
         </form>
 
+        <p className="mt-4 text-xs leading-relaxed text-[#9a9a92]">
+          This is a demo instance. The admin password is published in the{" "}
+          <a
+            href="https://github.com/connermajor/venuenest-waitlist#admin-access"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 transition-colors hover:text-sage-deep"
+          >
+            project README
+          </a>{" "}
+          on GitHub.
+        </p>
+
         <Link href="/" className="mt-6 inline-block text-sm text-[#8f8f8f] transition-colors hover:text-sage-deep">
           &larr; Back to the site
         </Link>

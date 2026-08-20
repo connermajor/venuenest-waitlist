@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import logo from "@/public/venuenest-logo.png";
 import WaitlistForm from "./waitlist-form";
@@ -49,6 +50,14 @@ export default async function Home() {
           )}
         </div>
       </div>
+
+      {/* Quiet entry point for the venue owner's own admin view. */}
+      <Link
+        href="/admin"
+        className="fixed bottom-4 right-4 rounded-full border border-[#ecece3] bg-white/70 px-3.5 py-1.5 text-xs font-medium text-[#8f8f8f] shadow-sm backdrop-blur transition-colors hover:border-sage-line hover:text-sage-deep"
+      >
+        Admin
+      </Link>
     </main>
   );
 }

@@ -1,5 +1,8 @@
 import { cookies } from "next/headers";
+import Image from "next/image";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import logo from "@/public/venuenest-logo.png";
 import { ADMIN_COOKIE, OWNER_SCOPE, verifyScope } from "@/lib/auth";
 import { login, logout, createProject } from "./actions";
 import AdminTable from "./admin-table";
@@ -10,29 +13,48 @@ const DEFAULT_SLUG = "venuenest";
 
 function LoginScreen({ error }: { error: boolean }) {
   return (
-    <main className="min-h-screen bg-cream flex items-center justify-center px-6">
-      <form action={login} className="w-full max-w-sm rounded-2xl border border-[#ecece3] bg-white p-6 shadow-sm">
-        <h1 className="font-serif text-xl text-ink">Admin access</h1>
-        <p className="mt-1 text-sm text-neutral-500">Enter your admin password to view signups.</p>
-        <input
-          name="password"
-          type="password"
-          required
-          placeholder="Password"
-          className="mt-4 w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-neutral-900 placeholder-neutral-400 outline-none transition-colors focus:border-neutral-900"
-        />
-        {error && (
-          <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-            Incorrect password.
-          </p>
-        )}
-        <button
-          type="submit"
-          className="mt-4 w-full rounded-md bg-[#5f7049] px-4 py-2.5 font-medium text-white transition-colors hover:bg-[#4e5d3b]"
-        >
-          Sign in
-        </button>
-      </form>
+    <main className="flex min-h-screen items-center justify-center bg-cream px-6 py-16">
+      <div className="w-full max-w-sm">
+        <div className="mb-8 flex items-center gap-2.5">
+          <Image src={logo} alt="VenueNest" width={44} height={34} priority />
+          <span className="font-serif text-lg tracking-tight text-ink">VenueNest</span>
+        </div>
+        <h1 className="font-serif text-4xl tracking-tight text-ink">Admin sign in</h1>
+        <p className="mt-3 leading-relaxed text-[#6e6e6e]">
+          Enter your password to see who has joined your waitlist.
+        </p>
+
+        <form action={login} className="mt-8 rounded-2xl border border-[#ecece3] bg-white p-7 shadow-sm">
+          <label htmlFor="admin-pw" className="mb-1.5 block text-sm font-medium text-ink">
+            Password
+          </label>
+          <input
+            id="admin-pw"
+            name="password"
+            type="password"
+            required
+            autoFocus
+            placeholder="Your admin password"
+            aria-invalid={error}
+            className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2.5 text-ink placeholder-neutral-400 outline-none transition-colors focus:border-sage-deep"
+          />
+          {error && (
+            <p role="alert" className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+              Incorrect password.
+            </p>
+          )}
+          <button
+            type="submit"
+            className="mt-4 w-full rounded-md bg-forest px-4 py-2.5 font-medium text-white transition-colors hover:bg-forest-deep"
+          >
+            Sign in
+          </button>
+        </form>
+
+        <Link href="/" className="mt-6 inline-block text-sm text-[#8f8f8f] transition-colors hover:text-sage-deep">
+          &larr; Back to the site
+        </Link>
+      </div>
     </main>
   );
 }
@@ -99,6 +121,10 @@ export default async function AdminPage({
   return (
     <main className="min-h-screen bg-cream px-6 py-10">
       <div className="mx-auto max-w-4xl">
+        <Link href="/" className="mb-6 inline-flex items-center gap-2.5">
+          <Image src={logo} alt="VenueNest" width={38} height={29} priority />
+          <span className="font-serif text-base tracking-tight text-ink">VenueNest</span>
+        </Link>
         <div className="flex items-center justify-between">
           <div>
             <h1 className="font-serif text-2xl text-ink">{isOwner ? "Waitlists" : active.name}</h1>

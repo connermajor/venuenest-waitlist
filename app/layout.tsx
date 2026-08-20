@@ -1,18 +1,7 @@
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
-import { Dancing_Script } from "next/font/google";
 import "./globals.css";
-
-// A soft wedding script used for small flourishes like the live "N in line"
-// count. Dancing Script keeps the hand-lettered feel but stays legible.
-// Self-hosted by next/font at build time (no runtime fetch).
-const script = Dancing_Script({
-  weight: "600",
-  subsets: ["latin"],
-  variable: "--font-script",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://venuenest-waitlist-three.vercel.app"),
@@ -36,7 +25,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable} ${script.variable}`}>
+    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
       <body className="antialiased">{children}</body>
     </html>
   );

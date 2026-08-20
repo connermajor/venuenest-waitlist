@@ -106,7 +106,7 @@ export async function sendReadyEmail({ to, name }: ReadyArgs): Promise<string | 
             </td></tr></table>
           </td></tr></table>
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:2px 0 6px;">
-            <a href="https://venuenest-waitlist-three.vercel.app" style="display:inline-block;background-color:#3a5a40;color:#ffffff;font-family:${SERIF};font-size:16px;text-decoration:none;padding:12px 30px;border-radius:8px;">Claim your spot</a>
+            <a href="https://venuenest-waitlist-three.vercel.app/claimed" style="display:inline-block;background-color:#3a5a40;color:#ffffff;font-family:${SERIF};font-size:16px;text-decoration:none;padding:12px 30px;border-radius:8px;">Claim your spot</a>
           </td></tr></table>
           <p style="margin:14px 0 0;font-family:${SERIF};font-size:14px;line-height:1.6;color:#8a8a82;text-align:center;">We'll follow up shortly to get you set up.</p>
         </td></tr>

@@ -20,7 +20,9 @@ export default async function ProjectWaitlist({
 
   let count = 0;
   try {
-    count = await prisma.waitlistEntry.count({ where: { projectId: project.id } });
+    count = await prisma.waitlistEntry.count({
+      where: { projectId: project.id, invitedAt: null },
+    });
   } catch {
     // DB not reachable at render time — still show the form.
   }
@@ -51,7 +53,7 @@ export default async function ProjectWaitlist({
         <div className="mt-4 flex items-center justify-between text-sm text-[#8f8f8f]">
           <span>We&apos;ll only email you about your spot.</span>
           {count > 0 && (
-            <span className="font-script text-2xl leading-none text-sage-deep">
+            <span className="font-serif text-sm text-sage-deep">
               {count.toLocaleString()} in line
             </span>
           )}

@@ -31,7 +31,7 @@ export default async function ProjectWaitlist({
         <div className="mb-8">
           <div className="flex items-center gap-2.5">
             <Image src={logo} alt="VenueNest" width={44} height={34} priority />
-            <span className="font-serif text-base uppercase tracking-[0.22em] text-ink">
+            <span className="font-serif text-lg tracking-tight text-ink">
               VenueNest
             </span>
           </div>

@@ -30,7 +30,7 @@ export async function sendConfirmationEmail({ to, name, position }: Confirmation
           <img src="${LOGO_URL}" width="92" alt="VenueNest" style="display:block;border:0;width:92px;height:auto;" />
         </td></tr>
         <tr><td align="center" style="padding-bottom:26px;">
-          <span style="font-family:${SERIF};font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#8a8a82;">VenueNest</span>
+          <span style="font-family:${SERIF};font-size:14px;letter-spacing:0;color:#8a8a82;">VenueNest</span>
         </td></tr>
         <tr><td style="background-color:#ffffff;border:1px solid #ecece3;border-radius:14px;padding:40px 40px 36px;">
           <h1 style="margin:0 0 18px;font-family:${SERIF};font-size:26px;font-weight:normal;color:#2e2e2a;text-align:center;">You're on the list</h1>

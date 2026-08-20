@@ -10,11 +10,57 @@ export const dynamic = "force-dynamic";
 // The primary list when a signup arrives without a slug (the homepage form).
 const DEFAULT_SLUG = "venuenest";
 
-// Waitlist position is per-project: your place in line within your own list.
+// Support address surfaced to people who are already signed up.
+const SUPPORT_EMAIL = "support@venuenest-example.com";
+
+// Waitlist position is per-project and counts only people still waiting, so it
+// lines up with the "N in line" count on the page (invited guests drop off).
 function positionOf(projectId: string, createdAt: Date) {
   return prisma.waitlistEntry.count({
-    where: { projectId, createdAt: { lte: createdAt } },
+    where: { projectId, invitedAt: null, createdAt: { lte: createdAt } },
   });
+}
+
+// Confirmation states we consider "the email actually reached them."
+const DELIVERED = new Set(["sent", "delivered", "opened"]);
+
+// Handles a signup for an email that is already on this list. Branches on where
+// they are in the flow rather than silently returning the same position:
+//   - already invited off the list  -> point them to their email / support
+//   - confirmation already delivered -> point them to their email / support
+//   - confirmation never arrived     -> re-send it, keep their place
+async function respondForExisting(projectId: string, email: string, fallbackName?: string) {
+  const existing = await prisma.waitlistEntry.findUnique({
+    where: { projectId_email: { projectId, email } },
+  });
+  // Shouldn't happen (we only call this when a duplicate exists), but stay safe.
+  if (!existing) {
+    return NextResponse.json({ status: "created", position: 0 });
+  }
+
+  const position = await positionOf(projectId, existing.createdAt);
+
+  if (existing.invitedAt) {
+    return NextResponse.json({ status: "already_invited", position, support: SUPPORT_EMAIL });
+  }
+  if (DELIVERED.has(existing.emailStatus ?? "")) {
+    return NextResponse.json({ status: "already_confirmed", position, support: SUPPORT_EMAIL });
+  }
+
+  // On the list but the confirmation never went through — re-send it and keep
+  // their original place in line.
+  const emailId = await sendConfirmationEmail({
+    to: email,
+    name: existing.name ?? fallbackName,
+    position,
+  });
+  if (emailId) {
+    await prisma.waitlistEntry.update({
+      where: { id: existing.id },
+      data: { emailId, emailStatus: "sent", emailUpdatedAt: new Date() },
+    });
+  }
+  return NextResponse.json({ status: "already_unconfirmed", position });
 }
 
 export async function POST(req: NextRequest) {
@@ -44,7 +90,7 @@ export async function POST(req: NextRequest) {
 
   // Honeypot: a filled hidden field means a bot. Pretend success, store nothing.
   if (company && company.length > 0) {
-    return NextResponse.json({ status: "ok", position: 0 });
+    return NextResponse.json({ status: "created", position: 0 });
   }
 
   // Resolve which waitlist (tenant) this signup belongs to.
@@ -53,6 +99,14 @@ export async function POST(req: NextRequest) {
   });
   if (!project) {
     return NextResponse.json({ error: "That waitlist doesn't exist." }, { status: 404 });
+  }
+
+  // Already on this list? Branch on their situation instead of duplicating them.
+  const existing = await prisma.waitlistEntry.findUnique({
+    where: { projectId_email: { projectId: project.id, email } },
+  });
+  if (existing) {
+    return respondForExisting(project.id, email, name);
   }
 
   try {
@@ -71,15 +125,12 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({ status: "ok", position });
+    return NextResponse.json({ status: "created", position });
   } catch (err) {
-    // Unique-constraint violation => already on this list. Idempotent, friendly.
+    // Unique-constraint violation => a duplicate slipped in between our check
+    // and the insert (a race). Fall back to the same branching logic.
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
-      const existing = await prisma.waitlistEntry.findUnique({
-        where: { projectId_email: { projectId: project.id, email } },
-      });
-      const position = existing ? await positionOf(project.id, existing.createdAt) : 0;
-      return NextResponse.json({ status: "already", position });
+      return respondForExisting(project.id, email, name);
     }
     console.error("[waitlist] create failed:", err);
     return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });

@@ -2,7 +2,15 @@
 
 import { useState } from "react";
 
-type Status = "idle" | "loading" | "ok" | "already" | "error";
+// Outcomes the API can report for a signup attempt.
+type ApiStatus =
+  | "created" // brand new signup
+  | "already_confirmed" // on the list, confirmation already delivered
+  | "already_unconfirmed" // on the list, confirmation re-sent just now
+  | "already_invited"; // already invited off the list
+type Status = "idle" | "loading" | ApiStatus | "error";
+
+const SUPPORT_EMAIL = "support@venuenest-example.com";
 
 // `slug` scopes the signup to a specific waitlist (tenant). Omitted on the
 // homepage, where the API defaults to the primary VenueNest list.
@@ -37,33 +45,15 @@ export default function WaitlistForm({ slug }: { slug?: string }) {
         return;
       }
       setPosition(json.position ?? null);
-      setStatus(json.status === "already" ? "already" : "ok");
+      setStatus((json.status as ApiStatus) ?? "created");
     } catch {
       setStatus("error");
       setMessage("Network error. Please try again.");
     }
   }
 
-  if (status === "ok" || status === "already") {
-    return (
-      <div className="py-2" role="status" aria-live="polite">
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-sage-line bg-sage-tint px-2.5 py-1 text-xs font-medium text-sage-deep">
-          <span className="h-1.5 w-1.5 rounded-full bg-sage-deep" />
-          {status === "already" ? "Already on the list" : "You're in"}
-        </span>
-        <h2 className="mt-4 font-serif text-2xl text-ink">
-          {status === "already" ? "You were already signed up" : "You're on the list"}
-        </h2>
-        {position ? (
-          <p className="mt-2 text-[#6e6e6e]">
-            You&apos;re <span className="font-mono text-sage-deep">#{position}</span> in
-            line. We sent a confirmation to your inbox.
-          </p>
-        ) : (
-          <p className="mt-2 text-[#6e6e6e]">We sent a confirmation to your inbox.</p>
-        )}
-      </div>
-    );
+  if (status !== "idle" && status !== "loading" && status !== "error") {
+    return <ResultScreen status={status} position={position} />;
   }
 
   return (
@@ -119,5 +109,82 @@ export default function WaitlistForm({ slug }: { slug?: string }) {
         {status === "loading" ? "Joining…" : "Join the waitlist"}
       </button>
     </form>
+  );
+}
+
+function SupportLine() {
+  return (
+    <>
+      Still need help? Email{" "}
+      <a
+        href={`mailto:${SUPPORT_EMAIL}`}
+        className="underline underline-offset-2 transition-colors hover:text-sage-deep"
+      >
+        {SUPPORT_EMAIL}
+      </a>
+      .
+    </>
+  );
+}
+
+// Renders the outcome of a signup attempt, tailored to which state the person
+// landed in. Position is shown as a #N chip where it's meaningful.
+function ResultScreen({ status, position }: { status: ApiStatus; position: number | null }) {
+  const spot = position ? (
+    <span className="font-mono text-sage-deep">#{position}</span>
+  ) : null;
+
+  const content: Record<ApiStatus, { badge: string; heading: string; body: React.ReactNode }> = {
+    created: {
+      badge: "You're in",
+      heading: "You're on the list",
+      body: spot ? (
+        <>You&apos;re {spot} in line. We&apos;ve sent a confirmation to your inbox.</>
+      ) : (
+        <>We&apos;ve sent a confirmation to your inbox.</>
+      ),
+    },
+    already_unconfirmed: {
+      badge: "Confirmation re-sent",
+      heading: "You're already on the list",
+      body: (
+        <>
+          You&apos;re {spot ?? "already"} in line. It looked like your confirmation
+          hadn&apos;t arrived, so we just re-sent it — check your inbox and spam.
+        </>
+      ),
+    },
+    already_confirmed: {
+      badge: "Already on the list",
+      heading: "You're already signed up",
+      body: (
+        <>
+          You&apos;re {spot ?? "already"} in line and we&apos;ve already emailed your
+          confirmation. Please check your inbox and spam. <SupportLine />
+        </>
+      ),
+    },
+    already_invited: {
+      badge: "You're at the front",
+      heading: "You've reached the front of the line",
+      body: (
+        <>
+          Good news — a spot has already opened up for you and we&apos;ve emailed
+          your next steps. Please check your inbox, or reach out. <SupportLine />
+        </>
+      ),
+    },
+  };
+
+  const c = content[status];
+  return (
+    <div className="py-2" role="status" aria-live="polite">
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-sage-line bg-sage-tint px-2.5 py-1 text-xs font-medium text-sage-deep">
+        <span className="h-1.5 w-1.5 rounded-full bg-sage-deep" />
+        {c.badge}
+      </span>
+      <h2 className="mt-4 font-serif text-2xl text-ink">{c.heading}</h2>
+      <p className="mt-2 leading-relaxed text-[#6e6e6e]">{c.body}</p>
+    </div>
   );
 }

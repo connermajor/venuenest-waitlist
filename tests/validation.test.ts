@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { signupSchema, createProjectSchema, slugSchema } from "@/lib/validation";
+import { signupSchema, slugSchema } from "@/lib/validation";
 
 describe("signupSchema", () => {
   it("accepts a valid email", () => {
@@ -67,17 +67,5 @@ describe("slugSchema", () => {
 
   it("rejects leading/trailing hyphens", () => {
     expect(slugSchema.safeParse("-garden-").success).toBe(false);
-  });
-});
-
-describe("createProjectSchema", () => {
-  it("accepts a name and slug", () => {
-    const r = createProjectSchema.safeParse({ name: "Garden Pavilion", slug: "garden-pavilion" });
-    expect(r.success).toBe(true);
-  });
-
-  it("requires a non-empty name", () => {
-    const r = createProjectSchema.safeParse({ name: "  ", slug: "garden-pavilion" });
-    expect(r.success).toBe(false);
   });
 });

@@ -21,6 +21,7 @@ function StatusBadge({ status }: { status: string | null }) {
     opened: "border-green-200 bg-green-50 text-green-700",
     bounced: "border-red-200 bg-red-50 text-red-700",
     complained: "border-red-200 bg-red-50 text-red-700",
+    failed: "border-red-200 bg-red-50 text-red-700",
     delivery_delayed: "border-amber-200 bg-amber-50 text-amber-700",
     unknown: "border-neutral-200 bg-neutral-50 text-neutral-500",
   };

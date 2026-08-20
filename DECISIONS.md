@@ -15,8 +15,11 @@ free tiers. All shipped and verified end to end.
 - **Waitlist position** returned on signup and shown in both the UI and the
   email; **idempotent** re-signups (a repeat email returns the same position,
   no error).
-- **Simple admin auth** (bonus #1): password login that stores a *hashed* token
-  in an httpOnly cookie, never the password itself.
+- **Scoped admin auth** (bonus #1): password login that stores a signed, *hashed*
+  session in an httpOnly cookie, never the password itself. The session is
+  scoped — the owner password sees every list, while an optional per-project
+  password scopes a session to just that one waitlist (enforced on the export
+  route too).
 - **Multi-tenancy** (bonus #2): a `Project` model with a `projectId` foreign key
   and a composite `@@unique([projectId, email])`, so the same email can be on
   different lists but not twice on one. The homepage `/` is the primary list;
@@ -31,7 +34,7 @@ free tiers. All shipped and verified end to end.
   (`aria-invalid`, `aria-describedby`, labelled fields).
 - **Real-world hardening** (bonus #5): a honeypot field and a per-IP rate limit
   to blunt bots, a `/api/health` DB check for uptime monitors, GitHub Actions CI
-  (lint + typecheck + test + build), and 29 unit tests.
+  (lint + typecheck + test + build), and 34 unit tests.
 
 ## Where I got stuck, and how I got unstuck
 
@@ -55,7 +58,7 @@ free tiers. All shipped and verified end to end.
   holds across serverless cold starts and instances.
 - Add double opt-in (confirm-your-email) and an unsubscribe link, which a real
   waitlist needs for deliverability and compliance.
-- Scope admin auth per-tenant (today one password sees all lists) and add an
-  audit trail.
+- Add an admin audit trail (who signed in, who exported) on top of the scoped
+  auth that's already in place.
 - Integration tests around the API route and webhook handler with a test
   database, not just unit tests on the pure functions.
